@@ -1,7 +1,6 @@
 ﻿-- Variant 5
 
 USE [AdventureWorks2012];
-GO
 
 -- a) добавьте в таблицу dbo.Employee поле EmpNum типа int;
 ALTER TABLE [dbo].[Employee] ADD EmpNum INT;

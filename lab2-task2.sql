@@ -1,15 +1,10 @@
 ﻿-- Variant 5
-
-CREATE TABLE dbo.Employee;
-
-USE [AdventureWorks2012]
-GO
+USE [AdventureWorks2012];
 
 -- a) создайте таблицу dbo.Employee с такой же структурой как HumanResources.Employee, кроме полей OrganizationLevel, 
 -- SalariedFlag, CurrentFlag, а также кроме полей с типом hierarchyid, uniqueidentifier, не включая индексы, ограничения и триггеры;
 IF OBJECT_ID('[dbo].[Employee]') IS NOT NULL 
-DROP TABLE [dbo].[Employee] 
-GO
+DROP TABLE [dbo].[Employee]
 
 CREATE TABLE [dbo].[Employee] ( 
 [BusinessEntityID]   INT                                     NOT NULL,
@@ -24,22 +19,18 @@ CREATE TABLE [dbo].[Employee] (
 [SickLeaveHours]     SMALLINT                                NOT NULL,
 [ModifiedDate]       DATETIME                                NOT NULL,
 CONSTRAINT   [PK_Employee_BusinessEntityID]  PRIMARY KEY CLUSTERED    ([BusinessEntityID] asc))
-GO
 
 -- b) используя инструкцию ALTER TABLE, создайте для таблицы dbo.Employee ограничение UNIQUE для поля NationalIDNumber;
 ALTER TABLE [dbo].[Employee] 
 ADD CONSTRAINT AK_Employee_NationalIDNumber_Unique UNIQUE ([NationalIDNumber]); 
-GO
 
 -- c) используя инструкцию ALTER TABLE, создайте для таблицы dbo.Employee ограничение для поля VacationHours, запрещающее заполнение этого поля значениями меньшими или равными 0;
 ALTER TABLE [dbo].[Employee] 
 ADD CONSTRAINT CHK_Employee_VacationHours_Positive CHECK ([VacationHours] > 0);
-GO
 
 -- d) используя инструкцию ALTER TABLE, создайте для таблицы dbo.Employee ограничение DEFAULT для поля VacationHours, задайте значение по умолчанию 144;
 ALTER TABLE [dbo].[Employee] 
 ADD CONSTRAINT DF_Employee_VacationHours DEFAULT 144 FOR VacationHours;
-GO
 
 -- e) заполните новую таблицу данными из HumanResources.Employee о сотрудниках на позиции ‘Buyer’. Не указывайте для выборки поле VacationHours, чтобы оно заполнилось значениями по умолчанию;
 INSERT INTO [dbo].[Employee] (
@@ -66,7 +57,6 @@ INSERT INTO [dbo].[Employee] (
 	[ModifiedDate]
 FROM [HumanResources].[Employee]
 WHERE [JobTitle] = 'Buyer';
-GO
 
 -- f) измените тип поля ModifiedDate на DATE и разрешите добавление null значений для него.
 ALTER TABLE [dbo].[Employee] 
