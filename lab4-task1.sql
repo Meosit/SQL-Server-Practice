@@ -1,4 +1,5 @@
 USE [AdventureWorks2012];
+GO
 
 -- a) Создайте таблицу Sales.CreditCardHst, которая будет хранить информацию об изменениях в таблице Sales.CreditCard.
 -- --------------------------------------------------------------------------------------------------------------------------
@@ -12,10 +13,11 @@ CREATE TABLE [Sales].[CreditCardHst] (
     SourceID INT NOT NULL,
     UserName VARCHAR(50) NOT NULL
 );
+GO
 
 -- b) Создайте один AFTER триггер для трех операций INSERT, UPDATE, DELETE для таблицы Sales.CreditCard. Триггер должен заполнять 
 -- таблицу Sales.CreditCardHst с указанием типа операции в поле Action в зависимости от оператора, вызвавшего триггер.
-CREATE OR ALTER TRIGGER [Sales].[Trigger_CreditCard_After_DML]
+CREATE TRIGGER [Sales].[Trigger_CreditCard_After_DML]
 ON [Sales].[CreditCard]
 AFTER INSERT, UPDATE, DELETE AS 
     INSERT INTO [Sales].[CreditCardHst](Action, ModifiedDate, SourceID, UserName) 
@@ -24,7 +26,7 @@ AFTER INSERT, UPDATE, DELETE AS
            WHEN  deleted.CreditCardID IS NULL THEN 'INSERT'
                                               ELSE 'UPDATE'
       END                                                   AS Action,
-      NOW()                                                 AS ModifiedDate,
+      GetDate()                                             AS ModifiedDate,
 	  COALESCE(inserted.CreditCardID, deleted.CreditCardID) AS SourceID,
       User_Name()                                           AS UserName
     FROM inserted FULL OUTER JOIN deleted
@@ -32,17 +34,23 @@ AFTER INSERT, UPDATE, DELETE AS
 GO
 
 -- c) Создайте представление VIEW, отображающее все поля таблицы Sales.CreditCard.
-CREATE OR ALTER VIEW [Sales].[View_CreditCard] AS SELECT * FROM [Sales].[CreditCard]
-
+CREATE VIEW [Sales].[View_CreditCard] AS SELECT * FROM [Sales].[CreditCard]
+GO
 
 -- d) Вставьте новую строку в Sales.CreditCard через представление. Обновите вставленную строку. Удалите вставленную строку. 
 -- Убедитесь, что все три операции отображены в Sales.CreditCardHst.
-INSERT INTO [Sales].[CreditCard](CreditCardID, CardType, ExpYear, ModifiedDate)
-VALUE (123456, 'Foo', 2021, NOW());
+INSERT INTO [Sales].[View_CreditCard](CardNumber, CardType, ExpMonth, ExpYear, ModifiedDate)
+VALUES (1111222233334444, 'Foo', 12, 2021, GetDate());
+GO
 
-UPDATE [Sales].[CreditCard] SET CardType = 'Bar' WHERE CreditCardID = 123456;
+UPDATE [Sales].[View_CreditCard] SET CardType = 'Bar' WHERE CardNumber = 1111222233334444;
+GO
 
-DELETE FROM [Sales].[CreditCard] WHERE CreditCardID = 123456;
+DELETE FROM [Sales].[View_CreditCard] WHERE CardNumber = 1111222233334444;
+GO
 
 SELECT * FROM [Sales].[CreditCardHst];
+GO
+
+DROP TABLE [Sales].[CreditCardHst];
 GO
