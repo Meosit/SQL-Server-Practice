@@ -1,8 +1,12 @@
-﻿USE [AdventureWorks2012];
+﻿-- Variant 5
+
+USE [AdventureWorks2012];
+GO
 
 -- a) выполните код, созданный во втором задании второй лабораторной работы. Добавьте в таблицу dbo.Employee поля SumTotal MONEY и SumTaxAmt MONEY. 
 -- Также создайте в таблице вычисляемое поле WithoutTax, вычисляющее разницу между общей суммой уплаченых налогов (SumTaxAmt) и общей суммой продаж (SumTotal).
 ALTER TABLE [dbo].[Employee] ADD SumTotal MONEY, SumTaxAmt MONEY, WithoutTax AS (SumTotal - SumTaxAmt);
+GO
 
 -- b) создайте временную таблицу #Employee, с первичным ключом по полю BusinessEntityID. Временная таблица должна включать все поля таблицы dbo.Employee за исключением поля WithoutTax.
 CREATE TABLE dbo.#Employee ( 
@@ -20,6 +24,7 @@ CREATE TABLE dbo.#Employee (
 [SumTotal]           MONEY                                   NULL,
 [SumTaxAmt]          MONEY                                   NULL,
 PRIMARY KEY CLUSTERED    ([BusinessEntityID] asc));
+GO
 
 -- c) заполните временную таблицу данными из dbo.Employee. Посчитайте сумму продаж (TotalDue) и сумму налогов (TaxAmt) для каждого сотрудника (EmployeeID) в таблице Purchasing.PurchaseOrderHeader и 
 -- заполните этими значениями поля SumTotal и SumTaxAmt. Выберите только те записи, где SumTotal > 5 000 000. Подсчет суммы продаж и суммы налогов осуществите в Common Table Expression (CTE).
@@ -82,6 +87,7 @@ INSERT INTO [dbo].[#Employee](
     [SumTotal]        ,
     [SumTaxAmt]
 FROM ENHANCED_EMPLOYEE;
+GO
 
 -- d) удалите из таблицы dbo.Employee строки, где MaritalStatus = ‘S’
 DELETE FROM [dbo].[Employee] WHERE [MaritalStatus] = 'S';
@@ -127,5 +133,5 @@ WHEN NOT MATCHED BY TARGET THEN
     )
 WHEN NOT MATCHED BY SOURCE THEN
     DELETE;
-    
+GO    
     

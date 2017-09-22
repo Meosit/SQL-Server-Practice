@@ -1,9 +1,11 @@
 ﻿-- Variant 5
 
 USE [AdventureWorks2012];
+GO
 
 -- a) добавьте в таблицу dbo.Employee поле EmpNum типа int;
 ALTER TABLE [dbo].[Employee] ADD EmpNum INT;
+GO
 
 -- b) объявите табличную переменную с такой же структурой как dbo.Employee и заполните ее данными из dbo.Employee. Поле VacationHours заполните из
 -- таблицы HumanResources.Employee. Поле EmpNum заполните последовательными номерами строк (примените оконные функции или создайте SEQUENCE);
