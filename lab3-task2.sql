@@ -24,47 +24,108 @@ PRIMARY KEY CLUSTERED    ([BusinessEntityID] asc));
 -- c) заполните временную таблицу данными из dbo.Employee. Посчитайте сумму продаж (TotalDue) и сумму налогов (TaxAmt) для каждого сотрудника (EmployeeID) в таблице Purchasing.PurchaseOrderHeader и 
 -- заполните этими значениями поля SumTotal и SumTaxAmt. Выберите только те записи, где SumTotal > 5 000 000. Подсчет суммы продаж и суммы налогов осуществите в Common Table Expression (CTE).
 
-WITH PSUMS AS (SELECT
+WITH ENHANCED_EMPLOYEE AS (SELECT
+    [BusinessEntityID],
+	[NationalIDNumber],
+	[LoginID]         ,
+	[JobTitle]        ,
+	[BirthDate]       ,
+	[MaritalStatus]   ,
+	[Gender]          ,
+	[HireDate]        ,
+	[VacationHours]   ,
+	[SickLeaveHours]  ,
+	[Employee].[ModifiedDate]    ,
 	SUM([TotalDue]) AS SumTotal,
 	SUM([TaxAmt]) AS SumTaxAmt
-FROM [Purchasing].[PurchaseOrderHeader]
-GROUP BY EmployeeID)
-SELECT 
-
+FROM [dbo].[Employee]
+INNER JOIN [Purchasing].[PurchaseOrderHeader]
+ON [BusinessEntityID] = [EmployeeID]
+GROUP BY [BusinessEntityID],
+	[NationalIDNumber],
+	[LoginID]         ,
+	[JobTitle]        ,
+	[BirthDate]       ,
+	[MaritalStatus]   ,
+	[Gender]          ,
+	[HireDate]        ,
+	[VacationHours]   ,
+    [SickLeaveHours]  ,
+    [Employee].[ModifiedDate]
+HAVING SUM([TotalDue]) > 5000000)
 INSERT INTO [dbo].[#Employee](
-	[BusinessEntityID],
-	[NationalIDNumber],
-	[LoginID]         ,
-	[JobTitle]        ,
-	[BirthDate]       ,
-	[MaritalStatus]   ,
-	[Gender]          ,
-	[HireDate]        ,
-	[VacationHours]   ,
-	[SickLeaveHours]  ,
-	[ModifiedDate]    
+    [BusinessEntityID],
+    [NationalIDNumber],
+    [LoginID]         ,
+    [JobTitle]        ,
+    [BirthDate]       ,
+    [MaritalStatus]   ,
+    [Gender]          ,
+    [HireDate]        ,
+    [VacationHours]   ,
+    [SickLeaveHours]  ,
+    [ModifiedDate]    ,
+    [SumTotal]        ,
+    [SumTaxAmt]
 ) SELECT 
-	[BusinessEntityID],
-	[NationalIDNumber],
-	[LoginID]         ,
-	[JobTitle]        ,
-	[BirthDate]       ,
-	[MaritalStatus]   ,
-	[Gender]          ,
-	[HireDate]        ,
-	[VacationHours]   ,
-	[SickLeaveHours]  ,
-	[ModifiedDate]    
-FROM [dbo].[Employee];
+    [BusinessEntityID],
+    [NationalIDNumber],
+    [LoginID]         ,
+    [JobTitle]        ,
+    [BirthDate]       ,
+    [MaritalStatus]   ,
+    [Gender]          ,
+    [HireDate]        ,
+    [VacationHours]   ,
+    [SickLeaveHours]  ,
+    [ModifiedDate]    ,
+    [SumTotal]        ,
+    [SumTaxAmt]
+FROM ENHANCED_EMPLOYEE;
 
 -- d) удалите из таблицы dbo.Employee строки, где MaritalStatus = ‘S’
 DELETE FROM [dbo].[Employee] WHERE [MaritalStatus] = 'S';
-
+SELECT * FROM [dbo].#Employee
 -- e) напишите Merge выражение, использующее dbo.Employee как target, а временную таблицу как source. Для связи target и source используйте BusinessEntityID. Обновите поля SumTotal и SumTaxAmt, 
 -- если запись присутствует в source и target. Если строка присутствует во временной таблице, но не существует в target, добавьте строку в dbo.Employee. Если в dbo.Employee присутствует такая 
 -- строка, которой не существует во временной таблице, удалите строку из dbo.Employee.
 MERGE INTO [dbo].[Employee] AS Target
-USING [dbo].[#Employee] AS Source
-ON Target.[BusinessEntityID] = Source.[BusinessEntityID]
-WHEN MATCHED THEN UPDATE SET 
-	
+USING [dbo].[#Employee]
+ON Target.[BusinessEntityID] = [#Employee].[BusinessEntityID]
+WHEN MATCHED THEN UPDATE SET
+    SumTotal = Target.SumTotal,
+    SumTaxAmt = Target.SumTaxAmt
+WHEN NOT MATCHED BY TARGET THEN
+    INSERT (
+		[BusinessEntityID],
+        [NationalIDNumber],
+        [LoginID]         ,
+        [JobTitle]        ,
+        [BirthDate]       ,
+        [MaritalStatus]   ,
+        [Gender]          ,
+        [HireDate]        ,
+        [VacationHours]   ,
+        [SickLeaveHours]  ,
+        [ModifiedDate]    ,
+        [SumTotal]        ,
+        [SumTaxAmt]
+    ) VALUES (
+		[#Employee].[BusinessEntityID],
+        [#Employee].[NationalIDNumber],
+        [#Employee].[LoginID]         ,
+        [#Employee].[JobTitle]        ,
+        [#Employee].[BirthDate]       ,
+        [#Employee].[MaritalStatus]   ,
+        [#Employee].[Gender]          ,
+        [#Employee].[HireDate]        ,
+        [#Employee].[VacationHours]   ,
+        [#Employee].[SickLeaveHours]  ,
+        [#Employee].[ModifiedDate]    ,
+        [#Employee].[SumTotal]        ,
+        [#Employee].[SumTaxAmt]
+    )
+WHEN NOT MATCHED BY SOURCE THEN
+    DELETE;
+    
+    
