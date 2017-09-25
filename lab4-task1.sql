@@ -1,3 +1,5 @@
+-- Variant 5
+
 USE [AdventureWorks2012];
 GO
 
@@ -6,6 +8,9 @@ GO
 -- Обязательные поля, которые должны присутствовать в таблице: ID — первичный ключ IDENTITY(1,1); Action — совершенное 
 -- действие (insert, update или delete); ModifiedDate — дата и время, когда была совершена операция; SourceID — первичный 
 -- ключ исходной таблицы; UserName — имя пользователя, совершившего операцию. Создайте другие поля, если считаете их нужными.
+IF OBJECT_ID('[Sales].[CreditCardHst]') IS NOT NULL 
+DROP TABLE [Sales].[CreditCardHst] 
+GO
 CREATE TABLE [Sales].[CreditCardHst] (
     ID INT IDENTITY(1,1) PRIMARY KEY,
     Action CHAR(6) NOT NULL CHECK (Action IN('INSERT', 'UPDATE', 'DELETE')),
