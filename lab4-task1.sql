@@ -8,9 +8,9 @@ GO
 -- Обязательные поля, которые должны присутствовать в таблице: ID — первичный ключ IDENTITY(1,1); Action — совершенное 
 -- действие (insert, update или delete); ModifiedDate — дата и время, когда была совершена операция; SourceID — первичный 
 -- ключ исходной таблицы; UserName — имя пользователя, совершившего операцию. Создайте другие поля, если считаете их нужными.
-IF OBJECT_ID('[Sales].[CreditCardHst]') IS NOT NULL 
 DROP TABLE [Sales].[CreditCardHst] 
 GO
+
 CREATE TABLE [Sales].[CreditCardHst] (
     ID INT IDENTITY(1,1) PRIMARY KEY,
     Action CHAR(6) NOT NULL CHECK (Action IN('INSERT', 'UPDATE', 'DELETE')),
@@ -22,6 +22,9 @@ GO
 
 -- b) Создайте один AFTER триггер для трех операций INSERT, UPDATE, DELETE для таблицы Sales.CreditCard. Триггер должен заполнять 
 -- таблицу Sales.CreditCardHst с указанием типа операции в поле Action в зависимости от оператора, вызвавшего триггер.
+DROP TRIGGER [Sales].[Trigger_CreditCard_After_DML];
+GO
+
 CREATE TRIGGER [Sales].[Trigger_CreditCard_After_DML]
 ON [Sales].[CreditCard]
 AFTER INSERT, UPDATE, DELETE AS 
@@ -39,6 +42,9 @@ AFTER INSERT, UPDATE, DELETE AS
 GO
 
 -- c) Создайте представление VIEW, отображающее все поля таблицы Sales.CreditCard.
+DROP VIEW [Sales].[View_CreditCard];
+GO
+
 CREATE VIEW [Sales].[View_CreditCard] AS SELECT * FROM [Sales].[CreditCard]
 GO
 
