@@ -98,7 +98,7 @@ UPDATE [Sales].[View_ExtendedCreditCard] SET
 	CardNumber = '00000000000000001',
 	ExpMonth = 12,
 	ExpYear = 2018
-WHERE BusinessEntityID = 4955;
+WHERE CreditCardID = 123475
 GO
 
 DELETE FROM [Sales].View_ExtendedCreditCard WHERE CardNumber = '00000000000000001';

@@ -48,18 +48,20 @@ SELECT
 	(SELECT [HE].[VacationHours] FROM [HumanResources].[Employee] AS [HE] WHERE [HE].[BusinessEntityID] = [DE].[BusinessEntityID]),
 	[SickLeaveHours],
 	[ModifiedDate],
-	ROW_NUMBER() OVER(ORDER BY (SELECT 0))
+	DENSE_RANK() OVER(ORDER BY BusinessEntityID)
 FROM [dbo].[Employee] AS [DE];
 
 SELECT * FROM @EmployeeVar;
 
 -- c) обновите поля VacationHours и EmpNum в dbo.Employee данными из табличной переменной. Если значение в табличной переменной в поле VacationHours = 0 — оставьте старое значение;
 UPDATE [dbo].[Employee] SET 
-	[Employee].[VacationHours] = IIF([TVAR].[VacationHours] != 0, 
-	[TVAR].[VacationHours], [EMP].[VacationHours]), [EmpNum] = [TVAR].[EmpNum]
+	[Employee].[VacationHours] = [TVAR].[VacationHours]
 FROM @EmployeeVar AS [TVAR] 
-INNER JOIN [dbo].[Employee] AS [EMP] 
-ON [TVAR].[BusinessEntityID] = [EMP].[BusinessEntityID];
+WHERE [TVAR].VacationHours != 0;
+
+UPDATE [dbo].Employee SET
+	[EmpNum] = [TVAR].[EmpNum]
+FROM @EmployeeVar AS [TVAR] 
 
 -- d) удалите данные из dbo.Employee, EmailPromotion которых равен 0 в таблице Person.Person;
 DELETE [EMP] 

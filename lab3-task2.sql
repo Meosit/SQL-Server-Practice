@@ -58,6 +58,7 @@ GROUP BY [BusinessEntityID],
     [SickLeaveHours]  ,
     [Employee].[ModifiedDate]
 HAVING SUM([TotalDue]) > 5000000)
+
 INSERT INTO [dbo].[#Employee](
     [BusinessEntityID],
     [NationalIDNumber],
@@ -99,8 +100,8 @@ MERGE INTO [dbo].[Employee] AS Target
 USING [dbo].[#Employee]
 ON Target.[BusinessEntityID] = [#Employee].[BusinessEntityID]
 WHEN MATCHED THEN UPDATE SET
-    SumTotal = Target.SumTotal,
-    SumTaxAmt = Target.SumTaxAmt
+    SumTotal = [#Employee].SumTotal,
+    SumTaxAmt = [#Employee].SumTaxAmt
 WHEN NOT MATCHED BY TARGET THEN
     INSERT (
 		[BusinessEntityID],
